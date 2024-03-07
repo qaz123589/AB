@@ -1,0 +1,36 @@
+#!/bin/python3
+
+import numpy as np
+import cv2
+
+def object_detect(image):
+    lower_red = np.array([0, 46, 43])
+    upper_red = np.array([10, 200, 255])
+    gs_image = cv2.GaussianBlur(image,(3,3),0)
+    hsv = cv2.cvtColor(gs_image, cv2.COLOR_BGR2HSV)
+    kernel = np.ones([3, 3], dtype=np.uint8)
+    erode = cv2.erode(hsv,kernel,iterations=2)
+    Range = cv2.inRange(erode, lower_red, upper_red)
+
+    contours, hierarchy = cv2.findContours(Range, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    for cnt in contours:
+        if cnt.shape[0] <90:
+            continue
+
+        (x, y, w, h) = cv2.boundingRect(cnt)
+        image = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+        X = float(x+w/2)
+        Y = float(y+h/2)
+        print(X,Y)
+    cv2.imshow("object", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+image = cv2.imread("C:\\Users\\DELL\\Desktop\\image-20221027164357622(1).png")
+object_detect(image)
+
+
+
+    
